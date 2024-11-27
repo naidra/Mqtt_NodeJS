@@ -22,8 +22,8 @@ client.on('message', function (topic, message) {
     const topicParts = topic.split('/');  
 
     // Extract parts of the topic (e.g., 'topic3' and 'user3')
+    const userPart = topicParts[1];   // For 'dein/mqtt/topic3/user3', userPart would be 'user3'
     const topicPart = topicParts[2];  // For 'dein/mqtt/topic3/user3', topicPart would be 'topic3'
-    const userPart = topicParts[3];   // For 'dein/mqtt/topic3/user3', userPart would be 'user3'
 
     console.log('Received message on topic:', topic);
     console.log('Topic part:', topicPart);
@@ -33,8 +33,8 @@ client.on('message', function (topic, message) {
     const formData = new FormData();
     formData.append('all_topic', topic);
     formData.append('data', message.toString());
-    formData.append('topic', topicPart);
     formData.append('user', userPart);
+    formData.append('topic', topicPart);
     axios.post('http://162.55.52.183/accept_mqtt_post', formData, {
         headers: formData.getHeaders(), // Include appropriate headers for formData
     })
