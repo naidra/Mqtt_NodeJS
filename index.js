@@ -1,6 +1,7 @@
 const mqtt = require('mqtt');
 const axios = require('axios');
 const FormData = require('form-data');
+const fs = require('fs');
 
 
 // MQTT-Broker verbinden
@@ -38,7 +39,7 @@ client.on('message', function (topic, message) {
     formData.append('user', userPart);
     formData.append('password', passwordPart);
     formData.append('topic', topicPart);
-    axios.post('http://162.55.52.183/accept_mqtt_post', formData, {
+    axios.post('http://159.69.194.65/accept_mqtt_post', formData, {
         headers: formData.getHeaders(), // Include appropriate headers for formData
     })
     .then(response => {
@@ -46,5 +47,13 @@ client.on('message', function (topic, message) {
     })
     .catch(error => {
         console.error('Error posting data to web endpoint:', error);
+    });
+});
+
+// on error create a log file in the same directory and write the error message
+client.on('error', function (error) {
+    fs.writeFile('error.log', error.message, function (err) {
+        if (err) return console.error('Error writing error log:', err);
+        console.log('Error log created');
     });
 });
