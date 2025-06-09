@@ -1,0 +1,12 @@
+# Prevent directory listing
+Options -Indexes
+
+# Allow Node.js and MQTT server to access/modify files
+<Files *>
+  Require all granted
+</Files>
+
+# Optional: Deny access to .htaccess itself
+<Files ".htaccess">
+  Require all denied
+</Files>

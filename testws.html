@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MQTT Client</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+  <h1>MQTT Client</h1>
+  <label>
+    Topic:
+    <input type="text" id="topicInput" value="test/topic">
+  </label>
+  <br>
+  <label>
+    Message:
+    <input type="text" id="messageInput" value="Hello from the Browser!">
+  </label>
+  <br>
+  <button onclick="publishMessage()">Publish Message</button>
+  <script>
+    const client = mqtt.connect('ws://82.29.177.62:1883/mqtt'); // WebSocket URL
+    
+    client.on('connect', function () {
+      console.log('Connected to MQTT Broker');
+      // Subscribe to the topic from input on connect
+      const topic = document.getElementById('topicInput').value;
+      client.subscribe(topic, function (err) {
+        if (err) {
+          console.error('Subscription Error:', err);
+        } else {
+          console.log('Subscribed to', topic);
+        }
+      });
+    });
+
+    client.on('message', function (topic, message) {
+      console.log('Received message:', topic, message.toString());
+    });
+
+    function publishMessage() {
+      const topic = document.getElementById('topicInput').value;
+      const message = document.getElementById('messageInput').value;
+      client.publish(topic, message);
+      console.log('Message sent to', topic);
+    }
+  </script>
+</body>
+</html>

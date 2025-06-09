@@ -2,6 +2,7 @@
   "name": "mqtt_nodejs",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
@@ -10,7 +11,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "aedes": "^0.51.3",
     "axios": "^1.7.8",
-    "mqtt": "^5.10.2"
+    "dotenv": "^16.5.0",
+    "mqtt": "^5.10.2",
+    "net": "^1.0.2"
   }
 }
