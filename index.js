@@ -42,11 +42,12 @@ broker.on('publish', (packet, client) => {
     const sensorName = topicParts[3];  // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', topicPart would be 'topic3'
     const sensorValue = topicParts[4];  // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', topicPart would be 'topic3'
 
+    if (username != userPart || password != passwordPart) return console.error('Invalid username or password');
     if (!topicParts || !passwordPart || !sensorName || !sensorValue) return console.error('Invalid topic format');
 
     const formData = new FormData();
-    formData.append('all_topic', topic);
-    formData.append('data', message.toString());
+    formData.append('all_topic', packet.topic);
+    formData.append('data', packet.payload.toString());
     formData.append('user', userPart);
     formData.append('password', passwordPart);
     formData.append('sensor_name', sensorName);
