@@ -18,25 +18,17 @@ server.listen(PORT, HOST, () => {
 });
 
 broker.on('client', (client) => {
-  console.log(`📥 Client connected: ${client.id}`);
+  // console.log(`📥 Client connected: ${client.id}`);
 });
 
 broker.on('clientDisconnect', (client) => {
-  console.log(`📤 Client disconnected: ${client.id}`);
+  // console.log(`📤 Client disconnected: ${client.id}`);
 });
 
-broker.on('publish', (packet, client) => {
+broker.on('publish', async (packet, client) => {
   if (client) {
-    // console.log(`📨 Message from ${client.id}: ${packet.payload.toString()} on topic ${packet.topic}`);
-
-    // if (!fs.existsSync('responses.txt')) {
-    //     fs.writeFileSync('responses.txt', '', 'utf8');
-    // }
-
-    // fs.appendFileSync('responses.txt', `Topic: ${packet.topic}\nMessage: ${packet.payload.toString()}\n\n`, 'utf8');
-
     const topicParts = packet.topic.split('/');
-    console.log(`📨 Message from ${client.id}: ${packet.payload.toString()} on topic ${packet.topic}`);
+    // console.log(`📨 Message from ${client.id}: ${packet.payload.toString()} on topic ${packet.topic}`);
 
     if (topicParts.length < 5) return console.error('Invalid topic format. Expected at least 5 parts.');
 
@@ -48,21 +40,33 @@ broker.on('publish', (packet, client) => {
     if (username != userPart || password != passwordPart) return console.error('Invalid username or password');
     if (!topicParts || !passwordPart || !sensorName || !sensorValue) return console.error('Invalid topic format');
 
-    const formData = new FormData();
-    formData.append('all_topic', packet.topic);
-    formData.append('data', packet.payload.toString());
-    formData.append('user', userPart);
-    formData.append('password', passwordPart);
-    formData.append('sensor_name', sensorName);
-    formData.append('sensor_value', sensorValue);
-    axios.post(`http://${HOST}/accept_mqtt_post`, formData, {
-        headers: formData.getHeaders(), // Include appropriate headers for formData
-    })
-    .then(response => {
-        console.log('Successfully posted data to web endpoint', response.data);
-    })
-    .catch(error => {
-        console.error('Error posting data to web endpoint:', error);
+    const timeNow = new Date().toISOString();
+    const data = await new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('all_topic', packet.topic);
+      formData.append('data', packet.payload.toString());
+      formData.append('user', userPart);
+      formData.append('password', passwordPart);
+      formData.append('sensor_name', sensorName);
+      formData.append('sensor_value', sensorValue);
+      axios.post(`http://${HOST}/accept_mqtt_post`, formData, {
+          headers: formData.getHeaders(), // Include appropriate headers for formData
+      })
+      .then(response => resolve(`Successfull: ${timeNow}`))
+      .catch(error => resolve(`Error: ${timeNow}`));
     });
+
+    console.log(`📤 Data posted to web endpoint: ${data}`);
+    if (!fs.existsSync('responses.txt')) {
+      fs.writeFileSync('responses.txt', '', 'utf8'); // Create the file if it doesn't exist
+    }
+
+    // Write data to responses.txt
+    try {
+      fs.appendFileSync('responses.txt', `${data}\n`, 'utf8');
+      console.log('Data successfully written to responses.txt');
+    } catch (err) {
+      console.error('Error writing to responses.txt:', err);
+    }
   }
 });
