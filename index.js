@@ -36,6 +36,9 @@ broker.on('publish', (packet, client) => {
     // fs.appendFileSync('responses.txt', `Topic: ${packet.topic}\nMessage: ${packet.payload.toString()}\n\n`, 'utf8');
 
     const topicParts = packet.topic.split('/');
+    console.log(`📨 Message from ${client.id}: ${packet.payload.toString()} on topic ${packet.topic}`);
+
+    if (topicParts.length < 5) return console.error('Invalid topic format. Expected at least 5 parts.');
 
     const userPart = topicParts[1];   // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', userPart would be 'usernu425'
     const passwordPart = topicParts[2];   // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', passwordPart would be '1212323'
