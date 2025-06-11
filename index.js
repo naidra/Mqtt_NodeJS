@@ -28,25 +28,34 @@ broker.on('clientDisconnect', (client) => {
 broker.on('publish', async (packet, client) => {
   if (client) {
     const topicParts = packet.topic.split('/');
-    // console.log(`📨 Message from ${client.id}: ${packet.payload.toString()} on topic ${packet.topic}`);
 
-    if (topicParts.length < 5) return console.error('Invalid topic format. Expected at least 5 parts.');
+    // Enforce username and password for publishing
+    // if (!client || !client.connDetails || !client.connDetails.username || !client.connDetails.password) {
+    //   return console.error('Publish denied: Username and password required');
+    // }
+    // if (client.connDetails.username !== username || client.connDetails.password !== password) {
+    //   return console.error('Publish denied: Invalid username or password');
+    // }
 
-    const userPart = topicParts[1];   // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', userPart would be 'usernu425'
-    const passwordPart = topicParts[2];   // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', passwordPart would be '1212323'
-    const sensorName = topicParts[3];  // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', topicPart would be 'topic3'
-    const sensorValue = topicParts[4];  // For 'mqtt/usernu425/1212323/0003-23-42-432-002-001/on', topicPart would be 'topic3'
+    // console.error('Req parts ------>>>>>: ' + packet.topic + ' - ' + packet.payload.toString());
 
-    if (username != userPart || password != passwordPart) return console.error('Invalid username or password');
-    if (!topicParts || !passwordPart || !sensorName || !sensorValue) return console.error('Invalid topic format');
+    const sensorName = topicParts[1];   // For shellies/0001-01-07-005-02-001-004-01-001/status
+    const type = topicParts[2];   // For shellies/0001-01-07-005-02-001-004-01-001/status
+    let sensorValue = 'false';
+    if (type === 'status') {
+      sensorValue = JSON.parse(packet.payload).motion.toString();
+    } else if (type === 'info') {
+      sensorValue = JSON.parse(packet.payload).sensor.motion.toString();
+    }
+
+    // if (username != userPart || password != passwordPart) return console.error('Invalid username or password');
+    // if (!topicParts || !passwordPart || !sensorName || !sensorValue) return console.error('Invalid topic format');
 
     const timeNow = new Date().toISOString();
     const data = await new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append('all_topic', packet.topic);
       formData.append('data', packet.payload.toString());
-      formData.append('user', userPart);
-      formData.append('password', passwordPart);
       formData.append('sensor_name', sensorName);
       formData.append('sensor_value', sensorValue);
       axios.post(`http://${HOST}/accept_mqtt_post`, formData, {
