@@ -10,8 +10,8 @@ const broker = aedes();
 // const PORT = 1883;
 // const HOST = '82.29.177.62'; // Bind to this IP
 // const HOST = 'localhost'; // Bind to this IP
-const PORT = 65002;
-const HOST = '72.60.93.42'; // Bind to this IP
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0'; // Bind to this IP
 const { MQTT_USERNAME: username, MQTT_PASSWORD: password } =  process.env;
 
 const server = net.createServer(broker.handle);
