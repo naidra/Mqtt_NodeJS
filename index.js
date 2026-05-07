@@ -21,15 +21,17 @@ server.listen(PORT, HOST, () => {
 });
 
 broker.on('client', (client) => {
-  // console.log(`📥 Client connected: ${client.id}`);
+  console.log(`📥 Client connected: ${client.id}`);
 });
 
 broker.on('clientDisconnect', (client) => {
-  // console.log(`📤 Client disconnected: ${client.id}`);
+  console.log(`📤 Client disconnected: ${client.id}`);
 });
 
 broker.on('publish', async (packet, client) => {
   if (client) {
+    console.log('Packet: ', packet);
+    console.log('Client: ', client);
     const topicParts = packet.topic.split('/');
 
     // Enforce username and password for publishing
