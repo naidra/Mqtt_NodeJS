@@ -1,17 +1,15 @@
-const axios = require('axios');
-const FormData = require('form-data');
-const fs = require('fs');
-const dotenv = require('dotenv'); // Load environment variables from .env file
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs';
+import dotenv from 'dotenv'; // Load environment variables from .env file
 dotenv.config();
-const aedes = require('aedes');
-const net = require('net');
+import aedes from 'aedes';
+import net from 'net';
 
 const broker = aedes();
-// const PORT = 1883;
-// const HOST = '82.29.177.62'; // Bind to this IP
-// const HOST = 'localhost'; // Bind to this IP
-const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0'; // Bind to this IP
+const PORT = 1883;
+const HOST = '82.29.177.62'; // Bind to this IP
+// const HOST = 'localhost'; // for locally // Bind to this IP
 const { MQTT_USERNAME: username, MQTT_PASSWORD: password } =  process.env;
 
 const server = net.createServer(broker.handle);
@@ -21,17 +19,15 @@ server.listen(PORT, HOST, () => {
 });
 
 broker.on('client', (client) => {
-  console.log(`📥 Client connected: ${client.id}`);
+  // console.log(`📥 Client connected: ${client.id}`);
 });
 
 broker.on('clientDisconnect', (client) => {
-  console.log(`📤 Client disconnected: ${client.id}`);
+  // console.log(`📤 Client disconnected: ${client.id}`);
 });
 
 broker.on('publish', async (packet, client) => {
   if (client) {
-    console.log('Packet: ', packet);
-    console.log('Client: ', client);
     const topicParts = packet.topic.split('/');
 
     // Enforce username and password for publishing
