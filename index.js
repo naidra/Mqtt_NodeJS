@@ -1,14 +1,15 @@
-import axios from 'axios';
-import FormData from 'form-data';
-import fs from 'fs';
-import dotenv from 'dotenv'; // Load environment variables from .env file
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+const dotenv = require('dotenv'); // Load environment variables from .env file
 dotenv.config();
-import aedes from 'aedes';
-import net from 'net';
+const aedes = require('aedes');
+const net = require('net');
 
 const broker = aedes();
 const PORT = 1883;
-const HOST = '82.29.177.62'; // Bind to this IP
+// const HOST = '82.29.177.62'; // Bind to this IP
+const HOST = 'localhost'; // Bind to this IP
 const { MQTT_USERNAME: username, MQTT_PASSWORD: password } =  process.env;
 
 const server = net.createServer(broker.handle);
